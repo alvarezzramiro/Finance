@@ -1,0 +1,26 @@
+package com.ramiro.financeapi.service;
+
+import com.ramiro.financeapi.dto.CreateTransactionRequest;
+import com.ramiro.financeapi.entity.Transaction;
+import com.ramiro.financeapi.repository.TransactionRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TransactionService {
+    private final TransactionRepository repository;
+
+    public TransactionService(TransactionRepository repository) {
+        this.repository = repository;
+    }
+
+    public Transaction createTransaction(
+            CreateTransactionRequest request
+    ) {
+        Transaction transaction = new Transaction();
+
+        transaction.setTitle(request.getTitle());
+        transaction.setAmount(request.getAmount());
+
+        return repository.save(transaction);
+    }
+}
