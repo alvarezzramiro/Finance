@@ -1,9 +1,30 @@
 package com.ramiro.financeapi.dto;
 
+import com.ramiro.financeapi.entity.TransactionType;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public class CreateTransactionRequest {
 
+    @NotBlank
     private String title;
+
+    @NotNull
+    @Positive
     private Double amount;
+
+    @NotNull
+    private TransactionType type;
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
+    }
 
     public String getTitle() {
         return title;

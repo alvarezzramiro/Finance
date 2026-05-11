@@ -4,6 +4,7 @@ import com.ramiro.financeapi.dto.CreateTransactionRequest;
 import com.ramiro.financeapi.entity.Transaction;
 import com.ramiro.financeapi.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -20,7 +21,12 @@ public class TransactionService {
 
         transaction.setTitle(request.getTitle());
         transaction.setAmount(request.getAmount());
+        transaction.setType(request.getType());
 
         return repository.save(transaction);
+    }
+
+    public List<Transaction> getAllTransactions() {
+        return repository.findAll();
     }
 }

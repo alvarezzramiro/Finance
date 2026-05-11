@@ -6,11 +6,9 @@ import com.ramiro.financeapi.entity.Transaction;
 import com.ramiro.financeapi.service.TransactionService;
 
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 public class HelloController {
@@ -33,8 +31,13 @@ public class HelloController {
 
     @PostMapping("/transactions")
     public Transaction createTransaction(
-            @RequestBody CreateTransactionRequest request
+            @Valid @RequestBody CreateTransactionRequest request
     ) {
         return transactionService.createTransaction(request);
+    }
+
+    @GetMapping("/transactions")
+    public List<Transaction> getTransactions() {
+        return transactionService.getAllTransactions();
     }
 }
