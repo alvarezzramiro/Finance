@@ -2,6 +2,8 @@ package com.ramiro.financeapi.service;
 
 import com.ramiro.financeapi.dto.CreateTransactionRequest;
 import com.ramiro.financeapi.entity.Transaction;
+import com.ramiro.financeapi.entity.TransactionCategory;
+import com.ramiro.financeapi.entity.TransactionType;
 import com.ramiro.financeapi.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -22,11 +24,20 @@ public class TransactionService {
         transaction.setTitle(request.getTitle());
         transaction.setAmount(request.getAmount());
         transaction.setType(request.getType());
+        transaction.setCategory(request.getCategory());
 
         return repository.save(transaction);
     }
 
     public List<Transaction> getAllTransactions() {
         return repository.findAll();
+    }
+
+    public List<Transaction> getTransactionByType(TransactionType type) {
+        return repository.findByType(type);
+    }
+
+    public List<Transaction> getTransactionByCategory(TransactionCategory category) {
+        return repository.findByCategory(category);
     }
 }

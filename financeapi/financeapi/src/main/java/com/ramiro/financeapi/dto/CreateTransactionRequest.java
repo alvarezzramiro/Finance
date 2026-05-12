@@ -1,5 +1,6 @@
 package com.ramiro.financeapi.dto;
 
+import com.ramiro.financeapi.entity.TransactionCategory;
 import com.ramiro.financeapi.entity.TransactionType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -17,6 +18,9 @@ public class CreateTransactionRequest {
 
     @NotNull
     private TransactionType type;
+
+    @NotNull
+    private TransactionCategory category;
 
     public TransactionType getType() {
         return type;
@@ -40,5 +44,13 @@ public class CreateTransactionRequest {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public TransactionCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(TransactionCategory category) {
+        this.category = category;
     }
 }

@@ -3,6 +3,8 @@ package com.ramiro.financeapi.controller;
 import com.ramiro.financeapi.dto.ApiResponse;
 import com.ramiro.financeapi.dto.CreateTransactionRequest;
 import com.ramiro.financeapi.entity.Transaction;
+import com.ramiro.financeapi.entity.TransactionCategory;
+import com.ramiro.financeapi.entity.TransactionType;
 import com.ramiro.financeapi.service.TransactionService;
 
 
@@ -39,5 +41,15 @@ public class HelloController {
     @GetMapping("/transactions")
     public List<Transaction> getTransactions() {
         return transactionService.getAllTransactions();
+    }
+
+    @GetMapping("/transactions/type/{type}")
+    public List<Transaction> getTransctionByType(@PathVariable TransactionType type) {
+        return transactionService.getTransactionByType(type);
+    }
+
+    @GetMapping("/transactions/category/{category}")
+    public List<Transaction> getTransctionByCategory(@PathVariable TransactionCategory category) {
+        return transactionService.getTransactionByCategory(category);
     }
 }

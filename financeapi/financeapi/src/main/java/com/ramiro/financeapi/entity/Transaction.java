@@ -20,6 +20,9 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
+    @Enumerated(EnumType.STRING)
+    private TransactionCategory category;
+
     public Long getId() {
         return id;
     }
@@ -50,5 +53,13 @@ public class Transaction {
 
     public void setType(TransactionType type) {
         this.type = type;
+    }
+
+    public TransactionCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(TransactionCategory category) {
+        this.category = category;
     }
 }
