@@ -30,4 +30,11 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse("Validation failed", errors);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ErrorResponse handleResourceNotFound( ResourceNotFoundException ex ) {
+
+        return new ErrorResponse(ex.getMessage(), null);
+    }
 }

@@ -1,7 +1,6 @@
 package com.ramiro.financeapi.controller;
 
-import com.ramiro.financeapi.dto.ApiResponse;
-import com.ramiro.financeapi.dto.CreateTransactionRequest;
+import com.ramiro.financeapi.dto.*;
 import com.ramiro.financeapi.entity.Transaction;
 import com.ramiro.financeapi.entity.TransactionCategory;
 import com.ramiro.financeapi.entity.TransactionType;
@@ -9,21 +8,19 @@ import com.ramiro.financeapi.service.TransactionService;
 
 
 import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class HelloController {
+@RequestMapping("/transactions")
+public class TransactionController {
 
     private final TransactionService transactionService;
 
-    public HelloController(TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
-    }
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hola desde Spring Boot";
     }
 
     @GetMapping("/api/status")
@@ -31,25 +28,45 @@ public class HelloController {
         return new ApiResponse("API funcionando", "1.0");
     }
 
-    @PostMapping("/transactions")
-    public Transaction createTransaction(
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionResponse createTransaction(
             @Valid @RequestBody CreateTransactionRequest request
     ) {
         return transactionService.createTransaction(request);
     }
 
-    @GetMapping("/transactions")
+    @GetMapping
     public List<Transaction> getTransactions() {
         return transactionService.getAllTransactions();
     }
 
-    @GetMapping("/transactions/type/{type}")
+    @GetMapping("/type/{type}")
     public List<Transaction> getTransctionByType(@PathVariable TransactionType type) {
         return transactionService.getTransactionByType(type);
     }
 
-    @GetMapping("/transactions/category/{category}")
+    @GetMapping("/category/{category}")
     public List<Transaction> getTransctionByCategory(@PathVariable TransactionCategory category) {
         return transactionService.getTransactionByCategory(category);
+    }
+
+    @GetMapping("/balance")
+    public BalanceResponse getBalance() {
+        return transactionService.getBalance();
+    }
+
+    @PutMapping("/{id}")
+    public TransactionResponse updateTransaction(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTransactionRequest request
+    ) {
+        return transactionService.updateTransaction(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTransaction ( @PathVariable Long id ) {
+        transactionService.deleteTransaction(id);
     }
 }
