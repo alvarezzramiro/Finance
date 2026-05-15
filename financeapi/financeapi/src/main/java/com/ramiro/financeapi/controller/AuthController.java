@@ -2,6 +2,8 @@ package com.ramiro.financeapi.controller;
 
 
 import com.ramiro.financeapi.dto.AuthResponse;
+import com.ramiro.financeapi.dto.LoginRequest;
+import com.ramiro.financeapi.dto.LoginResponse;
 import com.ramiro.financeapi.dto.RegisterRequest;
 import com.ramiro.financeapi.service.AuthService;
 import jakarta.validation.Valid;
@@ -24,5 +26,12 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
         return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    public LoginResponse login (
+            @Valid @RequestBody LoginRequest request
+    ) {
+        return authService.login(request);
     }
 }
