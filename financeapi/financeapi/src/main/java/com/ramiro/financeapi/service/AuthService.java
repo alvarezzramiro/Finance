@@ -7,6 +7,7 @@ import com.ramiro.financeapi.dto.RegisterRequest;
 import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.exception.InvalidCredentialsException;
 import com.ramiro.financeapi.repository.UserRepository;
+import com.ramiro.financeapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,12 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+    private final JwtService jwtsService;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtsService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtsService = jwtsService;
     }
 
     public AuthResponse register (RegisterRequest request) {
@@ -54,6 +55,8 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        return new LoginResponse("Login successful");
+        String token = jwtsService.generateToken(user.getEmail());
+
+        return new LoginResponse(token);
     }
 }
