@@ -1,11 +1,6 @@
 package com.ramiro.financeapi.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 
 @Entity
 public class Transaction {
@@ -16,6 +11,10 @@ public class Transaction {
     private String title;
 
     private Double amount;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private TransactionType type;
@@ -61,5 +60,13 @@ public class Transaction {
 
     public void setCategory(TransactionCategory category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

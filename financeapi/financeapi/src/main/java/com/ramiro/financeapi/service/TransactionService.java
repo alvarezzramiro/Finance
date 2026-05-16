@@ -7,17 +7,23 @@ import com.ramiro.financeapi.dto.UpdateTransactionRequest;
 import com.ramiro.financeapi.entity.Transaction;
 import com.ramiro.financeapi.entity.TransactionCategory;
 import com.ramiro.financeapi.entity.TransactionType;
+import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.exception.ResourceNotFoundException;
 import com.ramiro.financeapi.repository.TransactionRepository;
+import com.ramiro.financeapi.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
 public class TransactionService {
-    private final TransactionRepository repository;
+    private final TransactionRepository transactionRepository;
 
-    public TransactionService(TransactionRepository repository) {
-        this.repository = repository;
+    private final UserRepository userRepository;
+
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
     }
 
     public TransactionResponse createTransaction(
@@ -30,7 +36,10 @@ public class TransactionService {
         transaction.setType(request.getType());
         transaction.setCategory(request.getCategory());
 
-        Transaction savedTransaction =  repository.save(transaction);
+        User user = getAuthenticatedUser();
+        transaction.setUser(user);
+
+        Transaction savedTransaction =  transactionRepository.save(transaction);
 
         return new TransactionResponse(
             savedTransaction.getId(),
@@ -45,7 +54,7 @@ public class TransactionService {
             Long id,
             UpdateTransactionRequest request
     ) {
-        Transaction transaction = repository
+        Transaction transaction = transactionRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
 
@@ -54,7 +63,7 @@ public class TransactionService {
         transaction.setType(request.getType());
         transaction.setCategory(request.getCategory());
 
-        Transaction updatedTransaction =  repository.save(transaction);
+        Transaction updatedTransaction =  transactionRepository.save(transaction);
 
         return new TransactionResponse(
                 updatedTransaction.getId(),
@@ -67,7 +76,7 @@ public class TransactionService {
 
     public void deleteTransaction(Long id) {
 
-        Transaction transaction = repository
+        Transaction transaction = transactionRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -75,24 +84,25 @@ public class TransactionService {
                         )
                 );
 
-        repository.delete(transaction);
+        transactionRepository.delete(transaction);
     }
 
     public List<Transaction> getAllTransactions() {
-        return repository.findAll();
+        User user = getAuthenticatedUser();
+        return transactionRepository.findByUser(user);
     }
 
     public List<Transaction> getTransactionByType(TransactionType type) {
-        return repository.findByType(type);
+        return transactionRepository.findByType(type);
     }
 
     public List<Transaction> getTransactionByCategory(TransactionCategory category) {
-        return repository.findByCategory(category);
+        return transactionRepository.findByCategory(category);
     }
 
     public BalanceResponse getBalance() {
 
-        List<Transaction> transactions = repository.findAll();
+        List<Transaction> transactions = transactionRepository.findAll();
 
         double income = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
@@ -107,5 +117,15 @@ public class TransactionService {
         double balance = income - expense;
 
         return new BalanceResponse(income, expense, balance);
+    }
+
+    private User getAuthenticatedUser() {
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
