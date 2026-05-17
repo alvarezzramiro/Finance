@@ -9,6 +9,9 @@ import com.ramiro.financeapi.service.TransactionService;
 
 import jakarta.validation.Valid;
 
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -37,8 +40,8 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<Transaction> getTransactions() {
-        return transactionService.getAllTransactions();
+    public Page<TransactionResponse> getTransactions(@ParameterObject Pageable pageable) {
+        return transactionService.getAllTransactions(pageable);
     }
 
     @GetMapping("/type/{type}")

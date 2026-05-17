@@ -11,8 +11,11 @@ import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.exception.ResourceNotFoundException;
 import com.ramiro.financeapi.repository.TransactionRepository;
 import com.ramiro.financeapi.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -87,9 +90,21 @@ public class TransactionService {
         transactionRepository.delete(transaction);
     }
 
-    public List<Transaction> getAllTransactions() {
+    public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
         User user = getAuthenticatedUser();
-        return transactionRepository.findByUser(user);
+        return transactionRepository
+                .findByUser(user, pageable)
+                .map(transaction -> mapToResponse(transaction));
+    }
+
+    private TransactionResponse mapToResponse(Transaction transaction) {
+        return new TransactionResponse(
+                transaction.getId(),
+                transaction.getTitle(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getCategory()
+        );
     }
 
     public List<Transaction> getTransactionByType(TransactionType type) {
