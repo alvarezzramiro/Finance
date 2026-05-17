@@ -1,5 +1,6 @@
 package com.ramiro.financeapi.security;
 
+import com.ramiro.financeapi.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -19,10 +20,11 @@ public class JwtService {
             SECRET_KEY.getBytes()
     );
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail())
+                .claim("role", user.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis() + 1000 * 60 * 60)
@@ -39,5 +41,20 @@ public class JwtService {
                 .getPayload();
 
         return claims.getSubject();
+    }
+
+    public String extractRole(String token) {
+
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("role", String.class);
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 }

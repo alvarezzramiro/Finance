@@ -4,6 +4,7 @@ import com.ramiro.financeapi.dto.AuthResponse;
 import com.ramiro.financeapi.dto.LoginRequest;
 import com.ramiro.financeapi.dto.LoginResponse;
 import com.ramiro.financeapi.dto.RegisterRequest;
+import com.ramiro.financeapi.entity.Role;
 import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.exception.InvalidCredentialsException;
 import com.ramiro.financeapi.repository.UserRepository;
@@ -36,6 +37,7 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(Role.USER);
 
         userRepository.save(user);
 
@@ -55,7 +57,7 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String token = jwtsService.generateToken(user.getEmail());
+        String token = jwtsService.generateToken(user);
 
         return new LoginResponse(token);
     }
