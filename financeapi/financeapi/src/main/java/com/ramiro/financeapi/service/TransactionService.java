@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -49,7 +50,9 @@ public class TransactionService {
             savedTransaction.getTitle(),
             savedTransaction.getAmount(),
             savedTransaction.getType(),
-            savedTransaction.getCategory()
+            savedTransaction.getCategory(),
+            savedTransaction.getCreatedAt(),
+            savedTransaction.getUpdatedAt()
         );
     }
 
@@ -73,7 +76,9 @@ public class TransactionService {
                 updatedTransaction.getTitle(),
                 updatedTransaction.getAmount(),
                 updatedTransaction.getType(),
-                updatedTransaction.getCategory()
+                updatedTransaction.getCategory(),
+                updatedTransaction.getCreatedAt(),
+                updatedTransaction.getUpdatedAt()
         );
     }
 
@@ -103,7 +108,9 @@ public class TransactionService {
                 transaction.getTitle(),
                 transaction.getAmount(),
                 transaction.getType(),
-                transaction.getCategory()
+                transaction.getCategory(),
+                transaction.getCreatedAt(),
+                transaction.getUpdatedAt()
         );
     }
 
@@ -113,6 +120,27 @@ public class TransactionService {
 
     public List<Transaction> getTransactionByCategory(TransactionCategory category) {
         return transactionRepository.findByCategory(category);
+    }
+
+    public Page<TransactionResponse> getTransactions(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        User user = getAuthenticatedUser();
+
+        Page<Transaction> transactions;
+
+        if (startDate != null && endDate != null) {
+            transactions = transactionRepository
+                    .findByUserAndCreatedAtBetween(
+                            user,
+                            startDate.atStartOfDay(),
+                            endDate.atTime(23, 59, 59),
+                            pageable
+                    );
+        } else {
+            transactions = transactionRepository
+                    .findByUser(user, pageable);
+        }
+
+        return transactions.map(this::mapToResponse);
     }
 
     public BalanceResponse getBalance() {

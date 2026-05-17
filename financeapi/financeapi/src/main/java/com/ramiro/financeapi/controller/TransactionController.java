@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,8 +42,17 @@ public class TransactionController {
     }
 
     @GetMapping
-    public Page<TransactionResponse> getTransactions(@ParameterObject Pageable pageable) {
-        return transactionService.getAllTransactions(pageable);
+    public Page<TransactionResponse> getTransactions(
+
+            @RequestParam(required = false)
+            LocalDate startDate,
+
+            @RequestParam(required = false)
+            LocalDate endDate,
+
+            @ParameterObject Pageable pageable
+    ) {
+        return transactionService.getTransactions(startDate, endDate, pageable);
     }
 
     @GetMapping("/type/{type}")
