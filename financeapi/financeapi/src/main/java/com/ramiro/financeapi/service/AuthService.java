@@ -1,16 +1,18 @@
 package com.ramiro.financeapi.service;
 
-import com.ramiro.financeapi.dto.AuthResponse;
-import com.ramiro.financeapi.dto.LoginRequest;
-import com.ramiro.financeapi.dto.LoginResponse;
-import com.ramiro.financeapi.dto.RegisterRequest;
+import com.ramiro.financeapi.dto.*;
+import com.ramiro.financeapi.entity.RefreshToken;
 import com.ramiro.financeapi.entity.Role;
 import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.exception.InvalidCredentialsException;
+import com.ramiro.financeapi.repository.RefreshTokenRepository;
 import com.ramiro.financeapi.repository.UserRepository;
 import com.ramiro.financeapi.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -21,10 +23,13 @@ public class AuthService {
 
     private final JwtService jwtsService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtsService) {
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtsService, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtsService = jwtsService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public AuthResponse register (RegisterRequest request) {
@@ -57,8 +62,38 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String token = jwtsService.generateToken(user);
+        String accessToken = jwtsService.generateToken(user);
 
-        return new LoginResponse(token);
+        String refreshToken = createRefreshToken(user);
+
+        return new LoginResponse(accessToken, refreshToken);
+    }
+
+    private String createRefreshToken(User user) {
+
+        String token = UUID.randomUUID().toString();
+
+        RefreshToken refreshToken = new RefreshToken(token, user, LocalDateTime.now().plusDays(7));
+
+        refreshTokenRepository.save(refreshToken);
+
+        return token;
+    }
+
+    public RefreshResponse refreshToken(String token) {
+
+        RefreshToken refreshToken = refreshTokenRepository
+                .findByToken(token)
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid refresh token")
+                );
+
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Refresh token expired");
+        }
+
+        String accessToken = jwtsService.generateToken(refreshToken.getUser());
+
+        return new RefreshResponse(accessToken);
     }
 }

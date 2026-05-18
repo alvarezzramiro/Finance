@@ -1,10 +1,7 @@
 package com.ramiro.financeapi.controller;
 
 
-import com.ramiro.financeapi.dto.AuthResponse;
-import com.ramiro.financeapi.dto.LoginRequest;
-import com.ramiro.financeapi.dto.LoginResponse;
-import com.ramiro.financeapi.dto.RegisterRequest;
+import com.ramiro.financeapi.dto.*;
 import com.ramiro.financeapi.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -35,5 +32,10 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request
     ) {
         return authService.login(request);
+    }
+
+    @PostMapping("/refresh")
+    public RefreshResponse refresh(@RequestBody RefreshRequest request) {
+        return authService.refreshToken(request.getRefreshToken());
     }
 }
