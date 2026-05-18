@@ -25,9 +25,12 @@ public class TransactionService {
 
     private final UserRepository userRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
+    private final UserService userService;
+
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository, UserService userService) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public TransactionResponse createTransaction(
@@ -40,7 +43,7 @@ public class TransactionService {
         transaction.setType(request.getType());
         transaction.setCategory(request.getCategory());
 
-        User user = getAuthenticatedUser();
+        User user = userService.getAuthenticatedUser();
         transaction.setUser(user);
 
         Transaction savedTransaction =  transactionRepository.save(transaction);
@@ -96,7 +99,7 @@ public class TransactionService {
     }
 
     public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
-        User user = getAuthenticatedUser();
+        User user = userService.getAuthenticatedUser();
         return transactionRepository
                 .findByUser(user, pageable)
                 .map(transaction -> mapToResponse(transaction));
@@ -123,7 +126,7 @@ public class TransactionService {
     }
 
     public Page<TransactionResponse> getTransactions(LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        User user = getAuthenticatedUser();
+        User user = userService.getAuthenticatedUser();
 
         Page<Transaction> transactions;
 
@@ -160,15 +163,5 @@ public class TransactionService {
         double balance = income - expense;
 
         return new BalanceResponse(income, expense, balance);
-    }
-
-    private User getAuthenticatedUser() {
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

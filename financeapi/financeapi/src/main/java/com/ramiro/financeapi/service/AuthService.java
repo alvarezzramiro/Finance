@@ -71,13 +71,26 @@ public class AuthService {
 
     private String createRefreshToken(User user) {
 
-        String token = UUID.randomUUID().toString();
+        String newToken = UUID.randomUUID().toString();
 
-        RefreshToken refreshToken = new RefreshToken(token, user, LocalDateTime.now().plusDays(7));
+        RefreshToken refreshToken = refreshTokenRepository
+                .findByUser(user)
+                .orElse(
+                        new RefreshToken(
+                                newToken,
+                                user,
+                                LocalDateTime.now().plusDays(7)
+                        )
+                );
+
+        refreshToken.setToken(newToken);
+        refreshToken.setExpiryDate(
+                LocalDateTime.now().plusDays(7)
+        );
 
         refreshTokenRepository.save(refreshToken);
 
-        return token;
+        return newToken;
     }
 
     public RefreshResponse refreshToken(String token) {

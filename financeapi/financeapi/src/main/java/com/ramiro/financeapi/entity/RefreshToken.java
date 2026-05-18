@@ -43,4 +43,12 @@ public class RefreshToken {
     public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
+    }
 }

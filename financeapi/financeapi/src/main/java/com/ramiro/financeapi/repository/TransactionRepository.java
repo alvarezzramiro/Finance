@@ -7,7 +7,9 @@ import com.ramiro.financeapi.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,4 +26,24 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             LocalDateTime endDate,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+        AND t.type = 'INCOME'
+    """)
+    BigDecimal getTotalIncome(User user);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+        AND t.type = 'EXPENSE'
+    """)
+    BigDecimal getTotalExpense(User user);
+
+    long countByUser(User user);
+
+    long countByUserAndType(User user, TransactionType type);
 }
