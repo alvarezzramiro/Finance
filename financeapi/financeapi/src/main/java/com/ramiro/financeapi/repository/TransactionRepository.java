@@ -81,4 +81,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         ORDER BY month
     """, nativeQuery = true)
     List<Object[]> getMonthlySummary(Long userId);
+
+    @Query(value = """
+        SELECT
+            TO_CHAR(created_at, 'YYYY-MM') AS month,
+        
+            COALESCE(SUM(
+                CASE
+                    WHEN type = 'INCOME'
+                    THEN amount
+                    ELSE -amount
+                END
+            ), 0) AS balance
+        
+        FROM transaction
+        WHERE user_id = :userId
+        GROUP BY month
+        ORDER BY month
+    """, nativeQuery = true)
+    List<Object[]> getBlanceEvolution(Long userID);
 }

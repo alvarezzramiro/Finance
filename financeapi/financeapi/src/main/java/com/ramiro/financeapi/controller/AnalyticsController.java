@@ -1,6 +1,7 @@
 package com.ramiro.financeapi.controller;
 
 import com.ramiro.financeapi.dto.AnalyticsResponse;
+import com.ramiro.financeapi.dto.BalanceEvolutionResponse;
 import com.ramiro.financeapi.dto.CategoryExpenseResponse;
 import com.ramiro.financeapi.dto.MonthlySummaryResponse;
 import com.ramiro.financeapi.service.AnalyticsService;
@@ -34,5 +35,10 @@ public class AnalyticsController {
     @GetMapping("/monthly-summary")
     public List<MonthlySummaryResponse> getMonthlySummary() {
         return analyticsService.getMonthlySummary();
+    }
+
+    @GetMapping("/balance-evolution")
+    public List<BalanceEvolutionResponse> getBalanceEvolution() {
+        return analyticsService.getBalanceEvolution();
     }
 }

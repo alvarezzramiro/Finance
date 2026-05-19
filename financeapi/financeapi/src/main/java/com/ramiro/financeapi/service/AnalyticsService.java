@@ -1,6 +1,7 @@
 package com.ramiro.financeapi.service;
 
 import com.ramiro.financeapi.dto.AnalyticsResponse;
+import com.ramiro.financeapi.dto.BalanceEvolutionResponse;
 import com.ramiro.financeapi.dto.CategoryExpenseResponse;
 import com.ramiro.financeapi.dto.MonthlySummaryResponse;
 import com.ramiro.financeapi.entity.TransactionType;
@@ -56,5 +57,16 @@ public class AnalyticsService {
                         (BigDecimal) row[2]
                 ))
                 .toList();
+    }
+
+    public List<BalanceEvolutionResponse> getBalanceEvolution() {
+        User user = userService.getAuthenticatedUser();
+
+        List<Object[]> results = transactionRepository.getBlanceEvolution(user.getId());
+
+        return results.stream().map(row -> new BalanceEvolutionResponse(
+                (String) row[0],
+                (BigDecimal) row[1]
+        )).toList();
     }
 }
