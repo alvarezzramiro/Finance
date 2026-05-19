@@ -3,18 +3,19 @@ package com.ramiro.financeapi.dto;
 import com.ramiro.financeapi.entity.TransactionCategory;
 import com.ramiro.financeapi.entity.TransactionType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class TransactionResponse {
     private Long id;
     private String title;
-    private double amount;
+    private BigDecimal amount;
     private TransactionType type;
     private TransactionCategory category;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public TransactionResponse(Long id, String title, double amount, TransactionType type, TransactionCategory category, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public TransactionResponse(Long id, String title, BigDecimal amount, TransactionType type, TransactionCategory category, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.amount = amount;
@@ -32,7 +33,7 @@ public class TransactionResponse {
         return title;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 

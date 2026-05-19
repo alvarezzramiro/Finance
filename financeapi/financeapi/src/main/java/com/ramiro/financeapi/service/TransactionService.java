@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -150,17 +151,17 @@ public class TransactionService {
 
         List<Transaction> transactions = transactionRepository.findAll();
 
-        double income = transactions.stream()
+        BigDecimal income = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
-                .mapToDouble(Transaction::getAmount)
-                .sum();
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        double expense = transactions.stream()
+        BigDecimal expense = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .mapToDouble(Transaction::getAmount)
-                .sum();
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        double balance = income - expense;
+        BigDecimal balance = income.subtract(expense);
 
         return new BalanceResponse(income, expense, balance);
     }

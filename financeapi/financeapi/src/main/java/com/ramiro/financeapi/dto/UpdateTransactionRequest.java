@@ -6,13 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.math.BigDecimal;
+
 public class UpdateTransactionRequest {
 
     @NotBlank(message = "Title is required")
     private String title;
 
     @Positive(message = "Amount must be positive")
-    private Double amount;
+    private BigDecimal amount;
 
     @NotNull(message = "Type is required")
     private TransactionType type;
@@ -24,7 +26,7 @@ public class UpdateTransactionRequest {
         return title;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
@@ -40,7 +42,7 @@ public class UpdateTransactionRequest {
         this.title = title;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

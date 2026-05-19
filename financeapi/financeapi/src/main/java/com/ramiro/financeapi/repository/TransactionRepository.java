@@ -1,5 +1,6 @@
 package com.ramiro.financeapi.repository;
 
+import com.ramiro.financeapi.dto.CategoryExpenseResponse;
 import com.ramiro.financeapi.entity.Transaction;
 import com.ramiro.financeapi.entity.TransactionCategory;
 import com.ramiro.financeapi.entity.TransactionType;
@@ -46,4 +47,38 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     long countByUser(User user);
 
     long countByUserAndType(User user, TransactionType type);
+
+    @Query("""
+        SELECT new com.ramiro.financeapi.dto.CategoryExpenseResponse(
+            t.category, SUM(t.amount)
+        )
+        FROM Transaction t
+        WHERE t.user = :user AND t.type = 'EXPENSE'
+        GROUP BY t.category 
+    """)
+    List<CategoryExpenseResponse> getExpenseByCategory(User user);
+
+    @Query(value = """
+        SELECT
+            TO_CHAR(created_at, 'YYYY-MM') AS month,
+            COALESCE(SUM(
+                CASE
+                    WHEN type = 'INCOME'
+                    THEN amount
+                    ELSE 0
+                END
+            ), 0) AS income,
+            COALESCE(SUM(
+                CASE
+                    WHEN type = 'EXPENSE'
+                    THEN amount
+                    ELSE 0
+                END
+            ), 0) AS expense
+        FROM transaction
+        WHERE user_id = :userId
+        GROUP BY month
+        ORDER BY month
+    """, nativeQuery = true)
+    List<Object[]> getMonthlySummary(Long userId);
 }

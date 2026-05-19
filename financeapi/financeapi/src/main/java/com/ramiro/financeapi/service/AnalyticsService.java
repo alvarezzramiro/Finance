@@ -1,12 +1,15 @@
 package com.ramiro.financeapi.service;
 
 import com.ramiro.financeapi.dto.AnalyticsResponse;
+import com.ramiro.financeapi.dto.CategoryExpenseResponse;
+import com.ramiro.financeapi.dto.MonthlySummaryResponse;
 import com.ramiro.financeapi.entity.TransactionType;
 import com.ramiro.financeapi.entity.User;
 import com.ramiro.financeapi.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class AnalyticsService {
@@ -30,5 +33,28 @@ public class AnalyticsService {
         long expenseCount = transactionRepository.countByUserAndType(user, TransactionType.EXPENSE);
 
         return new AnalyticsResponse(income, expense, balance, count, incomeCount, expenseCount);
+    }
+
+    public List<CategoryExpenseResponse> getExpenseByCategory() {
+        User user = userService.getAuthenticatedUser();
+        return transactionRepository.getExpenseByCategory(user);
+    }
+
+    public List<MonthlySummaryResponse>
+    getMonthlySummary() {
+
+        User user = userService.getAuthenticatedUser();
+
+        List<Object[]> results =
+                transactionRepository
+                        .getMonthlySummary(user.getId());
+
+        return results.stream()
+                .map(row -> new MonthlySummaryResponse(
+                        (String) row[0],
+                        (BigDecimal) row[1],
+                        (BigDecimal) row[2]
+                ))
+                .toList();
     }
 }
